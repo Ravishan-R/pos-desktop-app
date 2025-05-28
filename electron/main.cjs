@@ -1,12 +1,15 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const db = require('./db.cjs');
 
-// Test DB connection
-console.log('Products:', db.getAllProducts());
-db.addProduct('Sample Product', 9.99, 10);
-console.log('Added sample product.');
+// IPC Handlers
+ipcMain.handle('get-products', () => {
+  return db.getAllProducts();
+});
 
+ipcMain.handle('add-product', (event, product) => {
+  return db.addProduct(product.name, product.price, product.stock);
+});
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -15,17 +18,20 @@ function createWindow() {
     minWidth: 1024,
     minHeight: 600,
     title: 'POS Desktop App',
-    icon: path.join(__dirname, 'icon.png'), // Windows & Linux only
+    icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       contextIsolation: true,
+      preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: false,
     },
   });
 
   win.loadURL('http://localhost:5173');
 
-  // Optional: Open DevTools by default
   // win.webContents.openDevTools();
+
+  console.log('Products:', db.getAllProducts());
+  // db.addProduct('Sample Product', 9.99, 10); // Dev only
 }
 
 app.whenReady().then(() => {
