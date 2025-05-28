@@ -4,6 +4,9 @@ const path = require('path');
 const dbPath = path.join(__dirname, 'pos.db');
 const db = new Database(dbPath);
 
+const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+console.log('Tables:', tables.map(t => t.name));
+
 // Create table if not exists
 db.prepare(`
   CREATE TABLE IF NOT EXISTS products (
