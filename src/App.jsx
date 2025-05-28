@@ -1,17 +1,16 @@
-import { useState } from 'react';
+import AddProduct from './components/AddProduct';
 import ProductList from './components/ProductList';
-import AddProductForm from './components/AddProductForm';
+import { useState } from 'react';
 
 function App() {
-  const [reloadFlag, setReloadFlag] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const refresh = () => setReloadFlag((r) => r + 1);
+  const refresh = () => setRefreshKey((prev) => prev + 1);
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">POS System</h1>
-      <AddProductForm onAdd={refresh} />
-      <ProductList key={reloadFlag} />
+    <div className="max-w-4xl mx-auto mt-8 space-y-6">
+      <AddProduct onAdd={refresh} />
+      <ProductList key={refreshKey} />
     </div>
   );
 }
