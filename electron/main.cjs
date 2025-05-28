@@ -1,5 +1,12 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const db = require('./db');
+
+// Test DB connection
+console.log('Products:', db.getAllProducts());
+db.addProduct('Sample Product', 9.99, 10);
+console.log('Added sample product.');
+
 
 function createWindow() {
   const win = new BrowserWindow({
