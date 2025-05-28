@@ -4,6 +4,7 @@ export default function ProductList() {
   const [products, setProducts] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [edited, setEdited] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
 
   const load = () => window.api.getProducts().then(setProducts);
 
@@ -11,19 +12,17 @@ export default function ProductList() {
     load();
   }, []);
 
-  const startEditing = (product) => {
-    setEditingId(product.id);
-    setEdited({ name: product.name, price: product.price, stock: product.stock });
-  };
+  // Filter products based on searchTerm (case-insensitive)
+  const filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const save = async (product) => {
-    const updated = { id: product.id, ...edited };
-    await window.api.updateProduct(updated);
+  const save = async (p) => {
+    await window.api.updateProduct({ ...p, ...edited });
     setEditingId(null);
     setEdited({});
     load();
   };
-  
 
   const del = async (id) => {
     if (confirm('Delete this product?')) {
@@ -35,6 +34,15 @@ export default function ProductList() {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-2">Product List</h2>
+
+      <input
+        type="text"
+        placeholder="Search products..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="border p-2 mb-4 w-full"
+      />
+
       <table className="w-full border text-left">
         <thead className="bg-gray-200">
           <tr>
@@ -46,17 +54,15 @@ export default function ProductList() {
           </tr>
         </thead>
         <tbody>
-          {products.map((p) => (
+          {filteredProducts.map((p) => (
             <tr key={p.id}>
               <td className="p-2 border">{p.id}</td>
               <td className="p-2 border">
                 {editingId === p.id ? (
                   <input
                     className="border p-1 w-full"
-                    value={edited.name}
-                    onChange={(e) =>
-                      setEdited((prev) => ({ ...prev, name: e.target.value }))
-                    }
+                    defaultValue={p.name}
+                    onChange={(e) => setEdited((prev) => ({ ...prev, name: e.target.value }))}
                   />
                 ) : (
                   p.name
@@ -67,13 +73,8 @@ export default function ProductList() {
                   <input
                     type="number"
                     className="border p-1 w-full"
-                    value={edited.price}
-                    onChange={(e) =>
-                      setEdited((prev) => ({
-                        ...prev,
-                        price: parseFloat(e.target.value),
-                      }))
-                    }
+                    defaultValue={p.price}
+                    onChange={(e) => setEdited((prev) => ({ ...prev, price: parseFloat(e.target.value) }))}
                   />
                 ) : (
                   `$${p.price.toFixed(2)}`
@@ -84,13 +85,8 @@ export default function ProductList() {
                   <input
                     type="number"
                     className="border p-1 w-full"
-                    value={edited.stock}
-                    onChange={(e) =>
-                      setEdited((prev) => ({
-                        ...prev,
-                        stock: parseInt(e.target.value),
-                      }))
-                    }
+                    defaultValue={p.stock}
+                    onChange={(e) => setEdited((prev) => ({ ...prev, stock: parseInt(e.target.value) }))}
                   />
                 ) : (
                   p.stock
@@ -105,10 +101,7 @@ export default function ProductList() {
                     Save
                   </button>
                 ) : (
-                  <button
-                    className="text-blue-600"
-                    onClick={() => startEditing(p)}
-                  >
+                  <button className="text-blue-600" onClick={() => setEditingId(p.id)}>
                     Edit
                   </button>
                 )}
@@ -118,6 +111,13 @@ export default function ProductList() {
               </td>
             </tr>
           ))}
+          {filteredProducts.length === 0 && (
+            <tr>
+              <td colSpan="5" className="p-4 text-center text-gray-500">
+                No products found.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
