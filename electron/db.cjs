@@ -1,27 +1,45 @@
-const path = require('path');
 const Database = require('better-sqlite3');
+const path = require('path');
 
-// Path to your database file
-const dbPath = path.join(__dirname, 'pos.sqlite');
+const dbPath = path.join(__dirname, 'pos.db');
 const db = new Database(dbPath);
 
-// Create products table if not exists
+// Create table if not exists
 db.prepare(`
   CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     price REAL NOT NULL,
-    stock INTEGER DEFAULT 0
+    stock INTEGER NOT NULL
   )
 `).run();
 
-// Export functions
-module.exports = {
-  getAllProducts: () => {
-    return db.prepare('SELECT * FROM products').all();
-  },
+// GET all
+function getAllProducts() {
+  return db.prepare('SELECT * FROM products').all();
+}
 
-  addProduct: (name, price, stock) => {
-    return db.prepare('INSERT INTO products (name, price, stock) VALUES (?, ?, ?)').run(name, price, stock);
-  }
+// ADD
+function addProduct(name, price, stock) {
+  return db.prepare('INSERT INTO products (name, price, stock) VALUES (?, ?, ?)')
+           .run(name, price, stock);
+}
+
+// UPDATE
+function updateProduct(id, name, price, stock) {
+  return db.prepare('UPDATE products SET name = ?, price = ?, stock = ? WHERE id = ?')
+           .run(name, price, stock, id);
+}
+
+
+// DELETE
+function deleteProduct(id) {
+  return db.prepare('DELETE FROM products WHERE id = ?').run(id);
+}
+
+module.exports = {
+  getAllProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct
 };

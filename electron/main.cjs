@@ -2,15 +2,6 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const db = require('./db.cjs');
 
-// IPC Handlers
-ipcMain.handle('get-products', () => {
-  return db.getAllProducts();
-});
-
-ipcMain.handle('add-product', (event, product) => {
-  return db.addProduct(product.name, product.price, product.stock);
-});
-
 function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
@@ -27,12 +18,22 @@ function createWindow() {
   });
 
   win.loadURL('http://localhost:5173');
-
-  // win.webContents.openDevTools();
-
-  console.log('Products:', db.getAllProducts());
-  // db.addProduct('Sample Product', 9.99, 10); // Dev only
 }
+
+// IPC Handlers
+ipcMain.handle('get-products', () => db.getAllProducts());
+
+ipcMain.handle('add-product', (event, product) => {
+  return db.addProduct(product.name, product.price, product.stock);
+});
+
+ipcMain.handle('update-product', (event, product) => {
+  return db.updateProduct(product.id, product.name, product.price, product.stock);
+});
+
+ipcMain.handle('delete-product', (event, id) => {
+  return db.deleteProduct(id);
+});
 
 app.whenReady().then(() => {
   createWindow();
