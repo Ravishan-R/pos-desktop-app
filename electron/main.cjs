@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const db = require('./db');
+const db = require('./db.cjs');
 
 // Test DB connection
 console.log('Products:', db.getAllProducts());
