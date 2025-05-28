@@ -35,6 +35,11 @@ ipcMain.handle('delete-product', (event, id) => {
   return db.deleteProduct(id);
 });
 
+ipcMain.handle('create-sale', (event, items) => {
+  return db.createSale(items);
+});
+
+
 app.whenReady().then(() => {
   createWindow();
 
