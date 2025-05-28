@@ -1,18 +1,38 @@
-import AddProduct from './components/AddProduct';
-import ProductList from './components/ProductList';
-import { useState } from 'react';
+import { Routes, Route, NavLink } from 'react-router-dom';
+import ProductPage from './pages/ProductPage';
+import SalesPage from './pages/SalesPage';
+import ReportsPage from './pages/ReportsPage';
 
-function App() {
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const refresh = () => setRefreshKey((prev) => prev + 1);
-
+export default function App() {
   return (
-    <div className="max-w-4xl mx-auto mt-8 space-y-6">
-      <AddProduct onAdd={refresh} />
-      <ProductList key={refreshKey} />
+    <div className="max-w-5xl mx-auto mt-8">
+      <nav className="mb-6 flex space-x-4 border-b pb-2">
+        <NavLink
+          to="/products"
+          className={({ isActive }) => isActive ? 'text-blue-600 font-bold' : 'text-gray-600'}
+        >
+          Products
+        </NavLink>
+        <NavLink
+          to="/sales"
+          className={({ isActive }) => isActive ? 'text-blue-600 font-bold' : 'text-gray-600'}
+        >
+          Sales
+        </NavLink>
+        <NavLink
+          to="/reports"
+          className={({ isActive }) => isActive ? 'text-blue-600 font-bold' : 'text-gray-600'}
+        >
+          Reports
+        </NavLink>
+      </nav>
+
+      <Routes>
+        <Route path="/products" element={<ProductPage />} />
+        <Route path="/sales" element={<SalesPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="*" element={<ProductPage />} /> {/* Default route */}
+      </Routes>
     </div>
   );
 }
-
-export default App;
